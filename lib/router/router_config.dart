@@ -59,7 +59,7 @@ final GoRouter router = GoRouter(
                  GoRoute(
                     path: 'albumdetails',
                     builder: (BuildContext context, GoRouterState state) {
-                      return const AlbumDetailScreen();
+                      return const AlbumDetailScreen(albumId: '',);
                     },
                   ),
                   GoRoute(

@@ -28,7 +28,7 @@ class AlbumNewsScreen extends StatefulWidget {
     });
     }
 
-  @override
+@override
 Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(title: const Text('Album News Screen')),
@@ -36,19 +36,48 @@ Widget build(BuildContext context) {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ElevatedButton(
-            onPressed: () => context.go('/a/albumdetails'),
-            child: const Text('Go to the Details screen'),
-          ),
+          
           const SizedBox(height: 20),
-          Text('Nombre d\'albums : ${_albumList.length}'),
+          const Text(
+            'Nouvautés',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           const SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
               itemCount: _albumList.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(_albumList[index].name), 
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Card(
+                    elevation: 4,
+                    child: ListTile(
+                      leading: Image.network(
+                        _albumList[index].img,
+                        width: 80,
+                        height: 80,
+                        fit: BoxFit.cover,
+                      ),
+                      title: Text(
+                        _albumList[index].name,
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: _albumList[index].artists.map((artist) => Text(artist.name)).toList(),
+                          ),
+                        ],
+                      ),
+                      onTap: () {
+                        print(_albumList[index].id);
+                         context.go('/a/albumdetails?albumId=${_albumList[index].id}');
+                      },
+                    ),
+                  ),
                 );
               },
             ),
@@ -58,4 +87,5 @@ Widget build(BuildContext context) {
     ),
   );
 }
+
   }
