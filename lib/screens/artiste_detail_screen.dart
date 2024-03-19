@@ -1,21 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:projet_spotify_gorouter/model/Artist.dart';
+import 'package:projet_spotify_gorouter/model/Artist.dart';
+import 'package:projet_spotify_gorouter/model/Track.dart';
+import 'package:projet_spotify_gorouter/services/ArtistProvider.dart';
 
-// -- detail d'un artiste
-class ArtisteDetailScreen extends StatelessWidget {
-  /// Constructs a [ArtisteDetailScreen]
-  const ArtisteDetailScreen({super.key});
+class ArtistDetailScreen extends StatefulWidget {
+  final String? artistId;
+
+  const ArtistDetailScreen({Key? key, this.artistId}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Artiste Details Screen')),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () => context.go('/a/albumdetails'),
-          child: const Text('Go back'),
-        ),
-      ),
-    );
+  State<ArtistDetailScreen> createState() => _ArtistDetailScreenState();
+}
+
+class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
+        Artist _artist = Artist(id: "", name: "", img: "");
+
+  @override
+  void initState() {
+    super.initState();
+    _getArtist();
   }
+
+  void _getArtist() async {
+    var result = await fetchArtist(widget.artistId!);
+    setState(() {
+      _artist = result!;
+    });
+  }
+  
+  @override
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    throw UnimplementedError();
+  }
+
 }
