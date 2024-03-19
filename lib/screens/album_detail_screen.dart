@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class AlbumDetailScreen extends StatefulWidget {
-  final String albumId;
+  final String? albumId;
 
   /// Constructs a [AlbumDetailScreen]
-  const AlbumDetailScreen({Key? key, required this.albumId}) : super(key: key);
+  const AlbumDetailScreen({Key? key, this.albumId}) : super(key: key);
 
   @override
   State<AlbumDetailScreen> createState() => _AlbumDetailScreenState();

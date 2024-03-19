@@ -73,8 +73,7 @@ Widget build(BuildContext context) {
                         ],
                       ),
                       onTap: () {
-                        print(_albumList[index].id);
-                         context.go('/a/albumdetails?albumId=${_albumList[index].id}');
+                         context.go('/a/albumdetails/${_albumList[index].id}');
                       },
                     ),
                   ),

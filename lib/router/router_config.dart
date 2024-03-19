@@ -57,10 +57,8 @@ final GoRouter router = GoRouter(
               routes: [
                 // child route
                  GoRoute(
-                    path: 'albumdetails',
-                    builder: (BuildContext context, GoRouterState state) {
-                      return const AlbumDetailScreen(albumId: '',);
-                    },
+                    path: 'albumdetails/:albumId',
+                    builder: (BuildContext context, GoRouterState state)=> AlbumDetailScreen(albumId: state.pathParameters["albumId"],),
                   ),
                   GoRoute(
                     path: 'artistedetails',
