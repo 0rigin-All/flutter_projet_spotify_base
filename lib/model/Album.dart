@@ -17,8 +17,8 @@ class Album {
       artists.add(Artist.fromJson(data['artists']?[i]));
     }
     List<Track> tracks = [];
-    num lenght = data['tracks']?.length ?? 0;
-    for(var i= 0; i < lenght; i++){
+    num length = data['tracks']?['items']?.length ?? 0;
+    for(var i= 0; i < length; i++){
       tracks.add(Track.fromJson(data['tracks']?['items']?[i]));
     }
     return Album(
