@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:projet_spotify_gorouter/model/Album.dart';
-import 'package:projet_spotify_gorouter/model/Artist.dart';
-import 'package:projet_spotify_gorouter/model/Track.dart';
 import 'package:projet_spotify_gorouter/services/AlbumProvider.dart';
 
 class AlbumDetailScreen extends StatefulWidget {
@@ -15,7 +13,7 @@ class AlbumDetailScreen extends StatefulWidget {
 }
 
 class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
-        Album _album = Album(name: "", id: "", artists: [], img: "", tracks: []);
+  Album _album = Album(name: "", id: "", artists: [], img: "", tracks: []);
 
   @override
   void initState() {
@@ -30,7 +28,6 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
     });
   }
 
- 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +51,7 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                       ),
                     ),
                   ),
-                  backgroundColor: Colors.black, 
+                  backgroundColor: Colors.black,
                 ),
                 SliverToBoxAdapter(
                   child: Padding(
@@ -67,7 +64,7 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white, // Couleur du texte
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -76,7 +73,7 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey, // Couleur du texte
+                            color: Colors.grey,
                           ),
                         ),
                         Wrap(
@@ -89,12 +86,12 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                                     context.go('/a/artistedetails/${artist.id}');
                                   },
                                   style: ElevatedButton.styleFrom(
-                                    primary: Colors.green, // Fond vert
-                                    onPrimary: Colors.black, // Texte noir
+                                    primary: Colors.green,
+                                    onPrimary: Colors.black,
                                   ),
                                   child: Text(
                                     artist.name,
-                                    style: const TextStyle(color: Colors.black), // Couleur du texte
+                                    style: const TextStyle(color: Colors.black),
                                   ),
                                 ),
                               )
@@ -106,7 +103,7 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey, // Couleur du texte
+                            color: Colors.grey,
                           ),
                         ),
                       ],
@@ -117,9 +114,20 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                   delegate: SliverChildBuilderDelegate(
                     (BuildContext context, int index) {
                       return ListTile(
-                        title: Text(
-                          _album.tracks[index].name,
-                          style: const TextStyle(color: Colors.white), // Couleur du texte
+                        title: Row(
+                          children: [
+                            IconButton(
+                              // ignore: prefer_const_constructors
+                              icon: Icon(Icons.play_arrow, color: Colors.white),
+                              onPressed: () {
+                                // Mettez ici la logique de lecture de la piste
+                              },
+                            ),
+                            Text(
+                              _album.tracks[index].name,
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ],
                         ),
                         // You can add more details of the track if needed
                       );
