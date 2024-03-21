@@ -5,10 +5,12 @@ import 'package:just_audio/just_audio.dart';
 import 'package:projet_spotify_gorouter/model/Album.dart';
 import 'package:projet_spotify_gorouter/services/ArtistProvider.dart';
 import 'package:projet_spotify_gorouter/services/TracksProvider.dart';
+import 'package:provider/provider.dart';
 
 import '../model/Artist.dart';
 import '../model/Track.dart';
 import '../services/AlbumProvider.dart';
+import '../services/ChangeNotifierProvider.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -23,19 +25,15 @@ class _SearchScreenState extends State<SearchScreen> {
   List<Artist> _searchArtistResults = [];
   List<Track> _searchTrackResults = [];
 
-  late AudioPlayer _audioPlayer;
+
+  late PlaylistProvider _playlistProvider;
 
    @override
   void initState() {
     super.initState();
-    _audioPlayer = AudioPlayer();
+    _playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
   }
 
-   @override
-  void dispose() {
-    _audioPlayer.dispose();
-    super.dispose();
-  }
   void _searchAlbums(String query) async {
     if (query.isEmpty) {
       setState(() {
@@ -59,6 +57,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search Albums & Artists'),
@@ -138,6 +137,7 @@ Widget _buildResults() {
 }
 
 Widget _buildTracks() {
+  final audioPlayer = Provider.of<AudioPlayer>(context);
   return ListView.builder(
     shrinkWrap: true,
     physics: const NeverScrollableScrollPhysics(),
@@ -145,14 +145,13 @@ Widget _buildTracks() {
     itemBuilder: (context, index) {
       final track = _searchTrackResults[index];
       return ListTile(
-        onTap: () async {
-          try {
-            await _audioPlayer.setUrl(track.audioUrl);
-            await _audioPlayer.play();
-          } catch (e) {
-            print("Error playing audio: $e");
-          }
-        },
+        onTap: () {
+  _playlistProvider.playlist.add(AudioSource.uri(Uri.parse(track.audioUrl)));
+
+  audioPlayer.setAudioSource(_playlistProvider.playlist, initialIndex: 0, initialPosition: Duration.zero);
+  audioPlayer.seek(Duration.zero, index: _playlistProvider.playlist.children.length - 1);
+  audioPlayer.play();
+},
         leading: const Icon(Icons.play_arrow, color: Colors.green), // Icône Play
         title: Text(track.name),
         subtitle: Text(track.artists.map((artist) => artist.name).join(', ')),

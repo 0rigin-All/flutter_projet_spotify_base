@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:projet_spotify_gorouter/model/Artist.dart';
 import 'package:projet_spotify_gorouter/services/ArtistProvider.dart';
+import 'package:projet_spotify_gorouter/services/ChangeNotifierProvider.dart';
+import 'package:provider/provider.dart';
 
 class ArtistDetailScreen extends StatefulWidget {
   final String? artistId;
@@ -15,10 +18,13 @@ class ArtistDetailScreen extends StatefulWidget {
 class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
   Artist _artist = Artist(id: "", name: "", img: "", topTracks: [], genres: []);
 
+  late PlaylistProvider _playlistProvider;
+
   @override
   void initState() {
     super.initState();
     _getArtist();
+    _playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
   }
 
   void _getArtist() async {
@@ -27,9 +33,10 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
       _artist = result!;
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
+    final audioPlayer = Provider.of<AudioPlayer>(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xFF1DB954), // Couleur verte de Spotify
@@ -47,14 +54,18 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
               backgroundColor: Colors.transparent,
               backgroundImage: _artist.img.isNotEmpty
                   ? Image.network(_artist.img).image
-                  : const AssetImage('assets/placeholder.png'), // Placeholder image
+                  : const AssetImage(
+                      'assets/placeholder.png'), // Placeholder image
             ),
             const SizedBox(
               height: 20,
             ),
             Text(
               _artist.name,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white), // Texte blanc
+              style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white), // Texte blanc
             ),
             const SizedBox(
               height: 10,
@@ -64,38 +75,91 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
             ),
             const Text(
               'Top Tracks',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white), // Texte blanc
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white), // Texte blanc
             ),
             const SizedBox(
               height: 10,
             ),
-             Expanded(
+            Expanded(
               child: ListView.builder(
                 itemCount: _artist.topTracks.length,
                 itemBuilder: (context, index) {
                   return Container(
-                    margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 20),
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.green), // Bordure verte
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween, // Alignement à droite
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.play_arrow, color: Colors.white), // Icône Play
+                          icon: const Icon(Icons.play_arrow,
+                              color: Colors.white), // Icône Play
                           onPressed: () {
-                            // Mettez ici la logique de lecture de la piste
+                            _playlistProvider.playlist.clear();
+                            _playlistProvider.playlist.add(
+                                AudioSource.uri(Uri.parse(_artist.topTracks[index].audioUrl)));
+                            audioPlayer.setAudioSource(
+                                _playlistProvider.playlist,
+                                initialIndex: 0,
+                                initialPosition: Duration.zero);
+                            audioPlayer.seek(Duration.zero,
+                                index:
+                                    _playlistProvider.playlist.children.length -
+                                        1);
+                            audioPlayer.play();
                           },
                         ),
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
                             _artist.topTracks[index].name,
-                            style: const TextStyle(color: Colors.white), // Texte blanc
+                            style: const TextStyle(
+                                color: Colors.white), // Texte blanc
                             textAlign: TextAlign.center, // Centrage du texte
                           ),
+                        ),
+                        PopupMenuButton<int>(
+                          icon: Icon(Icons.more_vert,
+                              color: Colors
+                                  .white), // Icône avec trois points verticaux
+                          itemBuilder: (context) => [
+                            PopupMenuItem<int>(
+                              value: 1,
+                              child: Text('Ajoutez à votre Playlist'),
+                            ),
+                            PopupMenuItem<int>(
+                              value: 2,
+                              child: Text('Lire ensuite'),
+                            ),
+                            PopupMenuItem<int>(
+                              value: 3,
+                              child: Text("Ajouter à la file d'attente"),
+                            ),
+                          ],
+                          onSelected: (value) {
+                            // Fonction à exécuter lorsqu'une option est sélectionnée
+                            switch (value) {
+                              case 1:
+                                print(audioPlayer.currentIndex);
+                                break;
+                              case 2:
+                                _playlistProvider.playlist.insert(audioPlayer.currentIndex! + 1,
+                                AudioSource.uri(Uri.parse(_artist.topTracks[index].audioUrl)));
+                                break;
+                              case 3:
+                                _playlistProvider.playlist.add(
+                                AudioSource.uri(Uri.parse(_artist.topTracks[index].audioUrl)));
+                                break;
+                            }
+                          },
                         ),
                       ],
                     ),
