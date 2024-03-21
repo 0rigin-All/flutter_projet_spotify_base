@@ -1,17 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:projet_spotify_gorouter/router/router_config.dart';
-
-/// Exemple d'application avec double navigation
-///  - une avec une bottom navigation bar (3 branches)
-///  - une navigation entre les pages de chaque branche
+import 'package:projet_spotify_gorouter/components/audio_player_widget.dart';
 
 void main() => runApp(const MyApp());
 
-/// The main app.
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  // -- le point d'entrée du main est le router
-  //    (pas de scafflod à ce niveau)
+  const MyApp({Key? key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
@@ -23,9 +18,15 @@ class MyApp extends StatelessWidget {
           seedColor: Colors.green,
           brightness: Brightness.light,
         ),
-      )
+      ),
+      builder: (context, child) {
+        return Stack(
+          children: [
+            child!,
+            AudioPlayerWidget(), // Ajout du lecteur audio au-dessus de toutes les pages
+          ],
+        );
+      },
     );
   }
 }
-
-

@@ -13,7 +13,7 @@ class ArtistDetailScreen extends StatefulWidget {
 }
 
 class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
-  Artist _artist = Artist(id: "", name: "", img: "", topTracks: []);
+  Artist _artist = Artist(id: "", name: "", img: "", topTracks: [], genres: []);
 
   @override
   void initState() {

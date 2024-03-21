@@ -127,3 +127,23 @@ undefined,
   workOut,
   worldMusic,
 }
+
+
+List<MusicGenre> parseMusicGenre(String value) {
+  List<MusicGenre> result = [];
+  
+  for (String genreName in value.split(' ')) {
+    String normalizedGenre = genreName.toLowerCase().replaceAll('-', '');
+    for (MusicGenre enumValue in MusicGenre.values) {
+      String normalizedEnumValue = enumValue.toString().toLowerCase().replaceAll('-', '');
+      if (normalizedEnumValue == normalizedGenre) {
+        print("enfin !");
+        result.add(enumValue);
+        break; 
+      }
+    }
+  }
+  
+  
+  return result;
+}

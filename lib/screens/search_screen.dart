@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:go_router/go_router.dart';
+import 'package:just_audio/just_audio.dart';
 
 import 'package:projet_spotify_gorouter/model/Album.dart';
+import 'package:projet_spotify_gorouter/services/ArtistProvider.dart';
+import 'package:projet_spotify_gorouter/services/TracksProvider.dart';
 
+import '../model/Artist.dart';
+import '../model/Track.dart';
 import '../services/AlbumProvider.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -15,30 +19,53 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   TextEditingController _searchController = TextEditingController();
-  List<Album> _searchResults = [];
+  List<Album> _searchAlbumResults = [];
+  List<Artist> _searchArtistResults = [];
+  List<Track> _searchTrackResults = [];
 
+  late AudioPlayer _audioPlayer;
+
+   @override
+  void initState() {
+    super.initState();
+    _audioPlayer = AudioPlayer();
+  }
+
+   @override
+  void dispose() {
+    _audioPlayer.dispose();
+    super.dispose();
+  }
   void _searchAlbums(String query) async {
     if (query.isEmpty) {
       setState(() {
-        _searchResults = [];
+        _searchAlbumResults = [];
+        _searchArtistResults = [];
+        _searchTrackResults = [];
       });
       return;
     }
 
-    var result = await fetchSearchAlbums(query);
+    var resultAlbum = await fetchSearchAlbums(query);
+    var resultArtists = await fetchSearchArtists(query);
+    var resultTracks = await fetchSearchTracks(query);
     setState(() {
-      _searchResults = result;
+      _searchAlbumResults = resultAlbum;
+      _searchArtistResults = resultArtists;
+      _searchTrackResults = resultTracks;
     });
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Search Albums'),
+        title: const Text('Search Albums & Artists'),
         backgroundColor: const Color(0xFF1DB954), // Couleur verte de Spotify
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -46,7 +73,7 @@ class _SearchScreenState extends State<SearchScreen> {
               controller: _searchController,
               onChanged: (value) => _searchAlbums(value),
               decoration: InputDecoration(
-                hintText: 'Search Albums...',
+                hintText: 'Search Albums & Artists...',
                 suffixIcon: IconButton(
                   icon: const Icon(Icons.clear),
                   onPressed: () {
@@ -57,28 +84,148 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
             ),
           ),
+          _buildResults(),
+        ],
+      ),
+    );
+  }
+Widget _buildResults() {
+  if (_searchController.text.isEmpty) {
+    return const Expanded(
+      child: Center(
+        child: Text(
+          'Start typing to search',
+          style: TextStyle(fontSize: 16),
+        ),
+      ),
+    );
+  } else {
+    return Expanded(
+      child: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Text(
+              'Top Results',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
           Expanded(
-            child: ListView.builder(
-              itemCount: _searchResults.length,
-              itemBuilder: (context, index) {
-                final album = _searchResults[index];
-                return ListTile(
-                  leading: album.img.isNotEmpty
-                      ? Image.network(
-                          album.img,
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        )
-                      : const Icon(Icons.image),
-                  title: Text(album.name),
-                  subtitle: Text(album.artists.map((artist) => artist.name).join(', ')),
-                );
-              },
+            child: ListView(
+              children: [
+                _buildCategoryTitle('Tracks'),
+                const SizedBox(height: 8),
+                _buildTracks(),
+                const SizedBox(height: 16),
+                _buildCategoryTitle('Albums'),
+                const SizedBox(height: 8),
+                _buildAlbums(),
+                const SizedBox(height: 16),
+                _buildCategoryTitle('Artists'),
+                const SizedBox(height: 8),
+                _buildArtists(),
+              ],
             ),
           ),
         ],
       ),
     );
   }
+}
+
+Widget _buildTracks() {
+  return ListView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: _searchTrackResults.length > 3 ? 3 : _searchTrackResults.length,
+    itemBuilder: (context, index) {
+      final track = _searchTrackResults[index];
+      return ListTile(
+        onTap: () async {
+          try {
+            await _audioPlayer.setUrl(track.audioUrl);
+            await _audioPlayer.play();
+          } catch (e) {
+            print("Error playing audio: $e");
+          }
+        },
+        leading: const Icon(Icons.play_arrow, color: Colors.green), // Icône Play
+        title: Text(track.name),
+        subtitle: Text(track.artists.map((artist) => artist.name).join(', ')),
+      );
+    },
+  );
+}
+
+Widget _buildCategoryTitle(String title) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    child: Text(
+      title,
+      style: const TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
+}
+
+Widget _buildAlbums() {
+  return ListView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: _searchAlbumResults.length > 3 ? 3 : _searchAlbumResults.length,
+    itemBuilder: (context, index) {
+      final album = _searchAlbumResults[index];
+      return ListTile(
+        onTap: () {
+          context.go('/b/albumdetails/${album.id}');
+        },
+        leading: album.img.isNotEmpty
+            ? Image.network(
+                album.img,
+                width: 80,
+                height: 80,
+                fit: BoxFit.cover,
+              )
+            : const Icon(Icons.image),
+        title: Text(album.name),
+        subtitle: Text(album.artists.map((artist) => artist.name).join(', ')),
+      );
+    },
+  );
+}
+
+Widget _buildArtists() {
+  return ListView.builder(
+    shrinkWrap: true,
+    physics: const NeverScrollableScrollPhysics(),
+    itemCount: _searchArtistResults.length > 3 ? 3 : _searchArtistResults.length,
+    itemBuilder: (context, index) {
+      final artist = _searchArtistResults[index];
+      return ListTile(
+        onTap: () {
+          context.go('/b/artistedetails/${artist.id}');
+        },
+        leading: ClipRRect(
+          borderRadius: BorderRadius.circular(40),
+          child: artist.img.isNotEmpty
+              ? Image.network(
+                  artist.img,
+                  width: 80,
+                  height: 80,
+                  fit: BoxFit.cover,
+                )
+              : const Icon(Icons.person),
+        ),
+        title: Text(artist.name),
+        subtitle: Text(artist.genres.map((genre) => genre.toString()).join(', ')),
+      );
+    },
+  );
+}
 }

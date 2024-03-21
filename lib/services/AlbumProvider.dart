@@ -7,8 +7,8 @@ import 'dart:convert';
 const urlApiSpotifyDomain = 'api.spotify.com';
 const urlApiGetNewRelease = '/v1/browse/new-releases';
 const urlApiGetAlbum = '/v1/albums';
-const urlApiSearchAlbum = "/v1/search";
-const token = "BQDLYyv556kLQsKTGhDMiLptw0Nc8Azkc-cwpJzUf2p5TAXZeW42NzcleN26MC3RzBQ3YEyo0bvoWaynRO_FW--ZC60LA3UOMcalEkFxtG73G6oGkZY";
+const urlApiSearch = "/v1/search";
+const token = "BQD7FxQX6D5Otrh6Wb_lzXWPPWHDrtjLM2zq1iQYMD8nVCC95DQWCAL-csZuT9udaDxzX4Mo6YRY0nEsQhuZPl788JheYk8zHWXC_Elg9XkQQjt8LEg";
 
 Future<Album?> fetchAlbum(String albumId) async {
   var url = Uri.https(urlApiSpotifyDomain, '$urlApiGetAlbum/$albumId');
@@ -51,7 +51,7 @@ Future<List<Album>> fetchSearchAlbums(String query) async {
   'q' : query
 };
   List<Album> list = [];
-  var url = Uri.https(urlApiSpotifyDomain, urlApiSearchAlbum, queryParameters );
+  var url = Uri.https(urlApiSpotifyDomain, urlApiSearch, queryParameters );
 
   var response = await http.get(
     url,

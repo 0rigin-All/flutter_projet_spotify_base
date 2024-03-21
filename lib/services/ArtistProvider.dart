@@ -32,3 +32,26 @@ Future<Artist?> fetchArtist(String artistId) async {
     return null;
   }
 }
+
+Future<List<Artist>> fetchSearchArtists(String query) async {
+  final queryParameters = {
+  'type': 'artist',
+  'market': 'FR',
+  'q' : query
+};
+  List<Artist> list = [];
+  var url = Uri.https(urlApiSpotifyDomain, urlApiSearch, queryParameters );
+
+  var response = await http.get(
+    url,
+    headers: {'Authorization': 'Bearer $token'}
+  );
+
+  if (response.statusCode == 200) {
+    var data = jsonDecode(response.body);
+    data['artists']?['items'].forEach((artist) => list.add(Artist.fromJson(artist)));
+    return list;
+  } else {
+    return [];
+  }
+}
