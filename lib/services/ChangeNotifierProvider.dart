@@ -7,15 +7,23 @@ class PlaylistProvider extends ChangeNotifier {
     useLazyPreparation: true,
     shuffleOrder: DefaultShuffleOrder(),
     children: []
-  );
+  );}
 
-  void addToPlaylist(Track track) {
-    playlist.add(AudioSource.uri(Uri.parse(track.audioUrl)));
+class PlaylistProviderT extends ChangeNotifier {
+  List<Track> playlist = [];
+
+  void addTrack(Track track) {
+    playlist.add(track);
     notifyListeners();
   }
 
   void clearPlaylist() {
     playlist.clear();
+    notifyListeners();
+  }
+
+  void insertTrack(int index, Track track) {
+    playlist.insert(index, track);
     notifyListeners();
   }
 }

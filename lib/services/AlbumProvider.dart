@@ -8,7 +8,7 @@ const urlApiSpotifyDomain = 'api.spotify.com';
 const urlApiGetNewRelease = '/v1/browse/new-releases';
 const urlApiGetAlbum = '/v1/albums';
 const urlApiSearch = "/v1/search";
-const token = "BQBFsbGMZ4YgM1KnWoEDU44z0C3NVE3AbRuGgPoyQKlu1-Gz9ZS-OM7zodng4NdQKHOV_iT3zDvsJBkRrlceAd7obcYY-mv-9XdEGsEvSS4gPO6oi3U";
+const token = "BQBHLCH-db6wmtz5uu86uu6uzXEJgdXfV1XKClCHyzk00EiFPPhvjdFVFLsoKnUgfalxvcKJ6fUt1IOPwZN9cVdSetGsyt9tpAe0ZyERkxQWOgdaLKo";
 
 Future<Album?> fetchAlbum(String albumId) async {
   var url = Uri.https(urlApiSpotifyDomain, '$urlApiGetAlbum/$albumId');

@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => PlaylistProvider()),
+        ChangeNotifierProvider(create: (context) => PlaylistProviderT()),
         Provider.value(value: audioPlayer), 
       ],
       child: MaterialApp.router(

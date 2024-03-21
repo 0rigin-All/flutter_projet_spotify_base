@@ -127,19 +127,19 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
                           ),
                         ),
                         PopupMenuButton<int>(
-                          icon: Icon(Icons.more_vert,
+                          icon: const Icon(Icons.more_vert,
                               color: Colors
                                   .white), // Icône avec trois points verticaux
                           itemBuilder: (context) => [
-                            PopupMenuItem<int>(
+                            const PopupMenuItem<int>(
                               value: 1,
                               child: Text('Ajoutez à votre Playlist'),
                             ),
-                            PopupMenuItem<int>(
+                            const PopupMenuItem<int>(
                               value: 2,
                               child: Text('Lire ensuite'),
                             ),
-                            PopupMenuItem<int>(
+                            const PopupMenuItem<int>(
                               value: 3,
                               child: Text("Ajouter à la file d'attente"),
                             ),
