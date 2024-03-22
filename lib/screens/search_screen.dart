@@ -62,28 +62,33 @@ class _SearchScreenState extends State<SearchScreen> {
         title: const Text('Search Albums & Artists'),
         backgroundColor: const Color(0xFF1DB954), // Couleur verte de Spotify
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) => _searchAlbums(value),
-              decoration: InputDecoration(
-                hintText: 'Search Albums & Artists...',
-                suffixIcon: IconButton(
-                  icon: const Icon(Icons.clear),
-                  onPressed: () {
-                    _searchController.clear();
-                    _searchAlbums('');
-                  },
-                ),
-              ),
+      body: Container(
+        color: Colors.black, // Fond noir
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+  controller: _searchController,
+  onChanged: (value) => _searchAlbums(value),
+  style: const TextStyle(color: Colors.white), // Couleur du texte en blanc
+  decoration: InputDecoration(
+    hintText: 'Search Albums & Artists...',
+    hintStyle: const TextStyle(color: Colors.white), // Couleur du texte d'indication en blanc
+    suffixIcon: IconButton(
+      icon: const Icon(Icons.clear, color: Colors.white), // Icône blanche
+      onPressed: () {
+        _searchController.clear();
+        _searchAlbums('');
+      },
+    ),
+  ),
+),
             ),
-          ),
-          _buildResults(),
-        ],
+            _buildResults(),
+          ],
+        ),
       ),
     );
   }
@@ -94,7 +99,7 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Center(
           child: Text(
             'Start typing to search',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 16, color: Colors.white), // Texte blanc
           ),
         ),
       );
@@ -109,6 +114,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
+                  color: Colors.white, // Texte blanc
                 ),
               ),
             ),
@@ -147,36 +153,36 @@ class _SearchScreenState extends State<SearchScreen> {
         final track = _searchTrackResults[index];
         return ListTile(
           onTap: () {
-            _playlistProvider.playlist.clear();
-            _playlistProviderT.playlist.clear();
+            index = audioPlayer.currentIndex ?? 0;
+            
             _playlistProvider.playlist
                 .add(AudioSource.uri(Uri.parse(track.audioUrl)));
             _playlistProviderT.playlist.add(track);
             audioPlayer.setAudioSource(_playlistProvider.playlist,
-                initialIndex: 0, initialPosition: Duration.zero);
+                initialIndex: index, initialPosition: Duration.zero);
             audioPlayer.seek(Duration.zero,
-                index: _playlistProvider.playlist.children.length - 1);
+                index: index);
             audioPlayer.play();
           },
           leading:
               const Icon(Icons.play_arrow, color: Colors.green), // Icône Play
-          title: Text(track.name),
-          subtitle: Text(track.artists.map((artist) => artist.name).join(', ')),
+          title: Text(track.name, style: const TextStyle(color: Colors.white)), // Texte blanc
+          subtitle: Text(track.artists.map((artist) => artist.name).join(', '), style: const TextStyle(color: Colors.white)), // Texte blanc
           trailing: PopupMenuButton<int>(
             icon: const Icon(Icons.more_vert,
-                color: Colors.white), // Icône avec trois points verticaux
+                color: Colors.green), // Icône avec trois points verticaux
             itemBuilder: (context) => [
               const PopupMenuItem<int>(
                 value: 1,
-                child: Text('Ajoutez à votre Playlist'),
+                child: Text('Add to Playlist', style: TextStyle(color: Colors.black)), // Texte blanc
               ),
               const PopupMenuItem<int>(
                 value: 2,
-                child: Text('Lire ensuite'),
+                child: Text('Play Next', style: TextStyle(color: Colors.black)), // Texte blanc
               ),
               const PopupMenuItem<int>(
                 value: 3,
-                child: Text("Ajouter à la file d'attente"),
+                child: Text('Add to Queue', style: TextStyle(color: Colors.black)), // Texte blanc
               ),
             ],
             onSelected: (value) {
@@ -213,6 +219,7 @@ class _SearchScreenState extends State<SearchScreen> {
         style: const TextStyle(
           fontSize: 16,
           fontWeight: FontWeight.bold,
+          color: Colors.white, // Texte blanc
         ),
       ),
     );
@@ -238,8 +245,8 @@ class _SearchScreenState extends State<SearchScreen> {
                   fit: BoxFit.cover,
                 )
               : const Icon(Icons.image),
-          title: Text(album.name),
-          subtitle: Text(album.artists.map((artist) => artist.name).join(', ')),
+          title: Text(album.name, style: const TextStyle(color: Colors.white)), // Texte blanc
+          subtitle: Text(album.artists.map((artist) => artist.name).join(', '), style: const TextStyle(color: Colors.white)), // Texte blanc
         );
       },
     );
@@ -268,11 +275,12 @@ class _SearchScreenState extends State<SearchScreen> {
                   )
                 : const Icon(Icons.person),
           ),
-          title: Text(artist.name),
+          title: Text(artist.name, style: const TextStyle(color: Colors.white)), // Texte blanc
           subtitle:
-              Text(artist.genres.map((genre) => genre.toString()).join(', ')),
+              Text(artist.genres.map((genre) => genre.toString()).join(', '), style: const TextStyle(color: Colors.white)), // Texte blanc
         );
       },
     );
   }
 }
+

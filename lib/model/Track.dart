@@ -18,4 +18,26 @@ class Track {
         audioUrl: data["preview_url"] ?? "",
         artists: artists);
   }
+   Map<String, dynamic> toMap() {
+    List<Map<String, dynamic>> artistsMapList = artists.map((artist) => artist.toMap()).toList();
+
+    return {
+      'name': name,
+      'id': id,
+      'artists': artistsMapList,
+      'audioUrl': audioUrl
+    };
+  }
+  factory Track.fromMap(Map<String, dynamic> map) {
+    List<Artist> artists = (map['artists'] as List<dynamic>).map((artistMap) {
+      return Artist.fromMap(artistMap);
+    }).toList();
+
+    return Track(
+      id: map['id'],
+      name: map['name'],
+      artists: artists,
+      audioUrl: map['audioUrl'],
+    );
+  }
 }

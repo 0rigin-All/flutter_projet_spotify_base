@@ -4,9 +4,15 @@ import 'package:provider/provider.dart';
 import 'package:projet_spotify_gorouter/router/router_config.dart';
 import 'package:projet_spotify_gorouter/components/audio_player_widget.dart';
 
+import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
+import 'package:sqflite/sqflite.dart';
+
 import 'services/ChangeNotifierProvider.dart';
 
-void main() => runApp(const MyApp());
+void main() {
+databaseFactory = databaseFactoryFfiWeb;
+runApp(const MyApp());
+}
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key});

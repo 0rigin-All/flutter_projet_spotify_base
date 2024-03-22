@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:projet_spotify_gorouter/model/Album.dart';
 import 'package:projet_spotify_gorouter/services/AlbumProvider.dart';
+import 'package:provider/provider.dart';
+
+import '../services/ChangeNotifierProvider.dart';
 
 class AlbumDetailScreen extends StatefulWidget {
   final String? albumId;
@@ -15,10 +19,15 @@ class AlbumDetailScreen extends StatefulWidget {
 class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
   Album _album = Album(name: "", id: "", artists: [], img: "", tracks: []);
 
+    late PlaylistProvider _playlistProvider;
+  late PlaylistProviderT _playlistProviderT;
+
   @override
   void initState() {
     super.initState();
     _getAlbum();
+        _playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
+    _playlistProviderT = Provider.of<PlaylistProviderT>(context, listen: false);
   }
 
   void _getAlbum() async {
@@ -30,6 +39,7 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final audioPlayer = Provider.of<AudioPlayer>(context);
     return Scaffold(
       backgroundColor: Colors.black,
       body: _album != null
@@ -120,13 +130,65 @@ class _AlbumDetailScreenState extends State<AlbumDetailScreen> {
                               // ignore: prefer_const_constructors
                               icon: Icon(Icons.play_arrow, color: Colors.white),
                               onPressed: () {
-                                // Mettez ici la logique de lecture de la piste
+                               var index2 = audioPlayer.currentIndex ?? 0;
+
+                            _playlistProvider.playlist.add(AudioSource.uri(
+                                Uri.parse(_album.tracks[index].audioUrl)));
+                            _playlistProviderT.playlist
+                                .add(_album.tracks[index]);
+                            audioPlayer.setAudioSource(
+                                _playlistProvider.playlist,
+                                initialIndex: index2,
+                                initialPosition: Duration.zero);
+                            audioPlayer.seek(Duration.zero, index: index2);
+                            audioPlayer.play();
                               },
                             ),
                             Text(
                               _album.tracks[index].name,
                               style: const TextStyle(color: Colors.white),
                             ),
+                            const SizedBox(width: 10),
+                        
+                        PopupMenuButton<int>(
+                          icon: const Icon(Icons.more_vert,
+                              color: Colors
+                                  .white), // Icône avec trois points verticaux
+                          itemBuilder: (context) => [
+                            const PopupMenuItem<int>(
+                              value: 1,
+                              child: Text('Ajoutez à votre Playlist'),
+                            ),
+                            const PopupMenuItem<int>(
+                              value: 2,
+                              child: Text('Lire ensuite'),
+                            ),
+                            const PopupMenuItem<int>(
+                              value: 3,
+                              child: Text("Ajouter à la file d'attente"),
+                            ),
+                          ],
+                          onSelected: (value) {
+                            // Fonction à exécuter lorsqu'une option est sélectionnée
+                            switch (value) {
+                              case 1:
+                                print(audioPlayer.currentIndex);
+                                break;
+                              case 2:
+                                _playlistProvider.playlist.insert(
+                                    audioPlayer.currentIndex! + 1,
+                                    AudioSource.uri(Uri.parse(_album.tracks[index].audioUrl)));
+                                _playlistProviderT.playlist.insert(
+                                    audioPlayer.currentIndex! + 1, _album.tracks[index]);
+                                break;
+                              case 3:
+                                _playlistProvider.playlist.add(
+                                    AudioSource.uri(Uri.parse(_album.tracks[index].audioUrl)));
+                                _playlistProviderT.playlist.add(_album.tracks[index]);
+                                break;
+                            }
+                          },
+                        ),
                           ],
                         ),
                         // You can add more details of the track if needed

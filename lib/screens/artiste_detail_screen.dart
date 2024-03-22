@@ -19,12 +19,14 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
   Artist _artist = Artist(id: "", name: "", img: "", topTracks: [], genres: []);
 
   late PlaylistProvider _playlistProvider;
+  late PlaylistProviderT _playlistProviderT;
 
   @override
   void initState() {
     super.initState();
     _getArtist();
     _playlistProvider = Provider.of<PlaylistProvider>(context, listen: false);
+    _playlistProviderT = Provider.of<PlaylistProviderT>(context, listen: false);
   }
 
   void _getArtist() async {
@@ -103,17 +105,17 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
                           icon: const Icon(Icons.play_arrow,
                               color: Colors.white), // Icône Play
                           onPressed: () {
-                            _playlistProvider.playlist.clear();
-                            _playlistProvider.playlist.add(
-                                AudioSource.uri(Uri.parse(_artist.topTracks[index].audioUrl)));
+                            var index2 = audioPlayer.currentIndex ?? 0;
+
+                            _playlistProvider.playlist.add(AudioSource.uri(
+                                Uri.parse(_artist.topTracks[index].audioUrl)));
+                            _playlistProviderT.playlist
+                                .add(_artist.topTracks[index]);
                             audioPlayer.setAudioSource(
                                 _playlistProvider.playlist,
-                                initialIndex: 0,
+                                initialIndex: index2,
                                 initialPosition: Duration.zero);
-                            audioPlayer.seek(Duration.zero,
-                                index:
-                                    _playlistProvider.playlist.children.length -
-                                        1);
+                            audioPlayer.seek(Duration.zero, index: index2);
                             audioPlayer.play();
                           },
                         ),
@@ -151,12 +153,16 @@ class _ArtistDetailScreenState extends State<ArtistDetailScreen> {
                                 print(audioPlayer.currentIndex);
                                 break;
                               case 2:
-                                _playlistProvider.playlist.insert(audioPlayer.currentIndex! + 1,
-                                AudioSource.uri(Uri.parse(_artist.topTracks[index].audioUrl)));
+                                _playlistProvider.playlist.insert(
+                                    audioPlayer.currentIndex! + 1,
+                                    AudioSource.uri(Uri.parse(_artist.topTracks[index].audioUrl)));
+                                _playlistProviderT.playlist.insert(
+                                    audioPlayer.currentIndex! + 1, _artist.topTracks[index]);
                                 break;
                               case 3:
                                 _playlistProvider.playlist.add(
-                                AudioSource.uri(Uri.parse(_artist.topTracks[index].audioUrl)));
+                                    AudioSource.uri(Uri.parse(_artist.topTracks[index].audioUrl)));
+                                _playlistProviderT.playlist.add(_artist.topTracks[index]);
                                 break;
                             }
                           },

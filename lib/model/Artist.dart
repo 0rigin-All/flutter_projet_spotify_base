@@ -29,5 +29,30 @@ class Artist {
         topTracks: topTracks,
         genres : genres);
   }
+  Map<String, dynamic> toMap() {
+    List<Map<String, dynamic>> topTracksMapList = topTracks.map((track) => track.toMap()).toList();
+
+    return {
+      'name': name,
+      'id': id,
+      'img': img,
+      'topTracks': topTracksMapList,
+      'genres': genres
+    };
+  }
+
+  factory Artist.fromMap(Map<String, dynamic> map) {
+    List<Track> topTracks = (map['topTracks'] as List<dynamic>).map((trackMap) {
+      return Track.fromMap(trackMap);
+    }).toList();
+
+    return Artist(
+      id: map['id'],
+      name: map['name'],
+      img: map['img'],
+      topTracks: topTracks,
+      genres: List<String>.from(map['genres']),
+    );
+  }
 }
 
